@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 flask = "*"
 campuspulse-event-ingest-schema = {editable = true, path = "./../event-data-schema"}
+flask-cors = "*"
 
 [dev-packages]
 
