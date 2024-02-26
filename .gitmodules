@@ -1,3 +1,0 @@
-[submodule "event-data-schema/campuspulse_event_ingest_schema"]
-	path = event-data-schema/campuspulse_event_ingest_schema
-	url = https://github.com/CampusPulse/event-data-schema
