@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request, send_file
 from flask_cors import CORS
-from schema import NormalizedEvent
 from pathlib import Path
+import json
 
 from campuspulse_event_ingest_schema import NormalizedEvent
 
