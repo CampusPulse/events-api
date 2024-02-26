@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 flask = "*"
+campuspulse-event-ingest-schema = {editable = true, path = "./../event-data-schema"}
 
 [dev-packages]
 
