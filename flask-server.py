@@ -4,6 +4,8 @@ from pathlib import Path
 import json
 
 from campuspulse_event_ingest_schema import NormalizedEvent
+from datetime import datetime, date
+
 
 app = Flask(__name__) 
 CORS(app)
@@ -24,7 +26,9 @@ if __name__ == '__main__':
             continue
         for line in datafile.read_text().split("\n"):
             if line.strip() != "":
-                alldata.append(NormalizedEvent.parse_obj(json.loads(line)).dict())
+                event = NormalizedEvent.parse_obj(json.loads(line))
+                if not event.start < datetime.now():
+                    alldata.append(event.dict())
 
 
     app.run(debug=True, port=3500)
