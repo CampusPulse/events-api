@@ -28,7 +28,13 @@ if __name__ == '__main__':
             if line.strip() != "":
                 event = NormalizedEvent.parse_obj(json.loads(line))
                 if not event.start < datetime.now():
-                    alldata.append(event.dict())
+                    alldata.append(event)
+
+
+    alldata = sorted(alldata, key=lambda e: e.start)
+
+    alldata = map(lambda e: e.dict(), alldata)
+    alldata = list(alldata)
 
 
     app.run(debug=True, port=3500)
