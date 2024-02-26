@@ -1,6 +1,9 @@
 from flask import Flask, jsonify, request, send_file
+from flask_cors import CORS
+from schema import NormalizedEvent
 
 app = Flask(__name__) 
+CORS(app)
 
 @app.route('/campus-pulse-api', methods = ['GET'])  
 def hello():
