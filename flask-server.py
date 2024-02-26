@@ -22,9 +22,9 @@ if __name__ == '__main__':
     for datafile in input_dir.glob("*.parsed.normalized.ndjson"):
         if not datafile.is_file():
             continue
-
-        for line in datafile.read_text():   
-            alldata.append(NormalizedEvent.parse_obj(json.loads(line)))
+        for line in datafile.read_text().split("\n"):
+            if line.strip() != "":
+                alldata.append(NormalizedEvent.parse_obj(json.loads(line)).dict())
 
 
     app.run(debug=True, port=3500)
