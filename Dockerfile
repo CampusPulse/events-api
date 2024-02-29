@@ -13,6 +13,8 @@ RUN pip install pipenv
 # Install project dependencies
 RUN pipenv install
 
+RUN pipenv install gunicorn
+
 # Copy the local code to the container
 COPY flask-server.py /app/
 
@@ -24,4 +26,4 @@ ENV FLASK_APP=flask-server.py
 ENV FLASK_RUN_HOST=0.0.0.0
 
 # Run the application
-CMD ["pipenv", "run", "flask", "run"]
+ENTRYPOINT pipenv run gunicorn --workers 2 --bind 0.0.0.0:5000 flask-server:app
