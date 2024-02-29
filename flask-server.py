@@ -17,10 +17,8 @@ def hello():
 
     return jsonify(alldata)
 
-if __name__ == '__main__':
-
-    input_dir = Path("./data")
-    
+def update_data(input_dir):
+    global alldata
     for datafile in input_dir.glob("*.parsed.normalized.ndjson"):
         if not datafile.is_file():
             continue
@@ -36,5 +34,12 @@ if __name__ == '__main__':
     alldata = map(lambda e: e.dict(), alldata)
     alldata = list(alldata)
 
+
+
+
+if __name__ == '__main__':
+    input_dir = Path("./data")
+    
+    update_data(input_dir)
 
     app.run(debug=True, port=3500)
