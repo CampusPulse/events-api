@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "82377c3f7ee2c2aed1670749ab2548da62e67a674d7f92a4ac2515137c01aed6"
+            "sha256": "b536d90819ecfd649a807ebfb10d5c22d74a5bef1b9d4a56224bddfc03ea1c00"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -25,8 +25,12 @@
             "version": "==1.7.0"
         },
         "campuspulse-event-ingest-schema": {
-            "editable": true,
-            "path": "./../event-data-schema"
+            "hashes": [
+                "sha256:848d7b7e9cf472d087a7df1524ee718b6ee5adf76e798eeebec0edb4f2f8237e",
+                "sha256:bac265abe1db151b5770d4f43697b87aed682f9305d6062e4a73af07b5438c9f"
+            ],
+            "index": "pypi",
+            "version": "==0.1.0"
         },
         "click": {
             "hashes": [
@@ -46,10 +50,10 @@
         },
         "email-validator": {
             "hashes": [
-                "sha256:a4b0bd1cf55f073b924258d19321b1f3aa74b4b5a71a42c305575dba920e1a44",
-                "sha256:c973053efbeddfef924dc0bd93f6e77a1ea7ee0fce935aea7103c7a3d6d2d637"
+                "sha256:200a70680ba08904be6d1eef729205cc0d687634399a5924d842533efb824b84",
+                "sha256:97d882d174e2a65732fb43bfce81a3a834cbc1bde8bf419e30ef5ea976370a05"
             ],
-            "version": "==2.1.0.post1"
+            "version": "==2.1.1"
         },
         "flask": {
             "hashes": [
