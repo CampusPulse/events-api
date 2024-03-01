@@ -19,6 +19,7 @@ def hello():
 
 def update_data(input_dir):
     global alldata
+    app.logger.info("Processing event data started")
     for datafile in input_dir.glob("*.parsed.normalized.ndjson"):
         if not datafile.is_file():
             continue
@@ -34,6 +35,7 @@ def update_data(input_dir):
     alldata = map(lambda e: e.dict(), alldata)
     alldata = list(alldata)
 
+    app.logger.info("Processing event data complete")
 
 input_dir = Path("./data")
 
