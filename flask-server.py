@@ -12,7 +12,7 @@ CORS(app)
 
 alldata = []
 
-@app.route('/campus-pulse-api', methods = ['GET'])  
+@app.route('/v0/public.json', methods = ['GET'])  
 def hello():
 
     return jsonify(alldata)
