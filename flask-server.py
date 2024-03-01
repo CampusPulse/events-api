@@ -35,11 +35,11 @@ def update_data(input_dir):
     alldata = list(alldata)
 
 
+input_dir = Path("./data")
 
+update_data(input_dir)
 
 if __name__ == '__main__':
-    input_dir = Path("./data")
-    
-    update_data(input_dir)
+
 
     app.run(debug=True, port=3500)
