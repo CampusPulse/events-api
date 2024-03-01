@@ -37,11 +37,16 @@ def update_data(input_dir):
 
     app.logger.info("Processing event data complete")
 
+
+if __name__ != '__main__':
+
+    gunicorn_error_logger = logging.getLogger('gunicorn.error')
+    app.logger.handlers = gunicorn_error_logger.handlers
+    app.logger.setLevel(gunicorn_error_logger.level)
+
 input_dir = Path("./data")
 
 update_data(input_dir)
 
 if __name__ == '__main__':
-
-
     app.run(debug=True, port=5000)

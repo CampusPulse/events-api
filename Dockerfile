@@ -26,4 +26,4 @@ ENV FLASK_APP=flask-server.py
 ENV FLASK_RUN_HOST=0.0.0.0
 
 # Run the application
-ENTRYPOINT pipenv run gunicorn --workers 2 --bind 0.0.0.0:5000 flask-server:app
+ENTRYPOINT pipenv run gunicorn --workers 2 --access-logfile - --log-level info --bind 0.0.0.0:5000 flask-server:app
