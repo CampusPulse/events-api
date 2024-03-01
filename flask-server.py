@@ -30,10 +30,10 @@ def update_data(input_dir):
                     alldata.append(event)
 
 
-    alldata = sorted(alldata, key=lambda e: e.start)
+    alldata_tmp = sorted(alldata, key=lambda e: e.start)
 
-    alldata = map(lambda e: e.dict(), alldata)
-    alldata = list(alldata)
+    alldata_tmp = map(lambda e: e.dict(), alldata_tmp)
+    alldata = list(alldata_tmp)
 
     app.logger.info("Processing event data complete")
 
