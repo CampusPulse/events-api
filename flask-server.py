@@ -5,7 +5,7 @@ import json
 
 from campuspulse_event_ingest_schema import NormalizedEvent
 from datetime import datetime, date
-
+import logging
 
 app = Flask(__name__) 
 CORS(app)
