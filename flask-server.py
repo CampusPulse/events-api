@@ -4,7 +4,7 @@ from pathlib import Path
 import json
 
 from campuspulse_event_ingest_schema import NormalizedEvent
-from datetime import datetime, date
+from datetime import datetime, date, timezone
 import logging
 
 app = Flask(__name__) 
@@ -23,11 +23,23 @@ def update_data(input_dir):
     for datafile in input_dir.glob("*.parsed.normalized.ndjson"):
         if not datafile.is_file():
             continue
+        tzun_count = 0
         for line in datafile.read_text().split("\n"):
             if line.strip() != "":
+                # TODO: update date filters on each request or on a schedule to keep it up to date
+
                 event = NormalizedEvent.parse_obj(json.loads(line))
-                if not event.start < datetime.now():
-                    alldata.append(event)
+                try:
+                    if not event.start < datetime.now(timezone.utc):
+                        alldata.append(event)
+                except TypeError as e:
+                    if str(e) != "can't compare offset-naive and offset-aware datetimes":
+                        # app.logger.error(f"file {datafile }")
+
+                        raise
+                    tzun_count += 1
+        if tzun_count >= 1:
+            app.logger.warning(f"file {datafile} contains {tzun_count} skipped timezone-unaware events")
 
 
     alldata_tmp = sorted(alldata, key=lambda e: e.start)
