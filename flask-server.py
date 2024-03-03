@@ -13,7 +13,7 @@ CORS(app)
 alldata = []
 
 @app.route('/v0/public.json', methods = ['GET'])  
-def hello():
+def public_json():
 
     return jsonify(alldata)
 
