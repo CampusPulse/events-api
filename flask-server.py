@@ -26,11 +26,22 @@ def public_ics():
     # Add events to the calendar
     for event in alldata:
         cal_event = Event()
-        cal_event.add('summary', event['summary'])
-        cal_event.add('dtstart', datetime.strptime(event['dtstart'], '%Y-%m-%d %H:%M:%S'))
-        cal_event.add('dtend', datetime.strptime(event['dtend'], '%Y-%m-%d %H:%M:%S'))
+        cal_event.add('summary', event['title'])
+        cal_event.add('dtstart', datetime.strptime(event['start'], '%Y-%m-%dT%H:%M:%S%z'))
+        cal_event.add('dtend', datetime.strptime(event['end'], '%Y-%m-%dT%H:%M:%S%z'))
         cal_event.add('description', event['description'])
-        cal_event.add('location', event['location'])
+        
+        location = event['location']
+        location_str = ', '.join(filter(None, [
+            location.get('building'),
+            location.get('room_number'),
+            location.get('street'),
+            location.get('city'),
+            location.get('state'),
+            location.get('zipcode')
+        ]))
+        cal_event.add('location', location_str)
+        
         cal.add_component(cal_event)
     
     # Create a response object
