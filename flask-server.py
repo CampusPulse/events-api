@@ -28,8 +28,8 @@ def public_ics():
         try:
             cal_event = Event()
             cal_event.add('summary', event['title'])
-            cal_event.add('dtstart', datetime.strptime(event['start'], '%Y-%m-%dT%H:%M:%S%z'))
-            cal_event.add('dtend', datetime.strptime(event['end'], '%Y-%m-%dT%H:%M:%S%z'))
+            cal_event.add('dtstart', event['start'])
+            cal_event.add('dtend', event['end'])
             cal_event.add('description', event['description'])
             
             location = event['location']
