@@ -25,25 +25,27 @@ def public_ics():
     
     # Add events to the calendar
     for event in alldata:
-        cal_event = Event()
-        cal_event.add('summary', event['title'])
-        cal_event.add('dtstart', datetime.strptime(event['start'], '%Y-%m-%dT%H:%M:%S%z'))
-        cal_event.add('dtend', datetime.strptime(event['end'], '%Y-%m-%dT%H:%M:%S%z'))
-        cal_event.add('description', event['description'])
+        try:
+            cal_event = Event()
+            cal_event.add('summary', event['title'])
+            cal_event.add('dtstart', datetime.strptime(event['start'], '%Y-%m-%dT%H:%M:%S%z'))
+            cal_event.add('dtend', datetime.strptime(event['end'], '%Y-%m-%dT%H:%M:%S%z'))
+            cal_event.add('description', event['description'])
+            
+            location = event['location']
+            location_str = ', '.join(filter(None, [
+                location.get('building'),
+                location.get('room_number'),
+                location.get('street'),
+                location.get('city'),
+                location.get('state'),
+                location.get('zipcode')
+            ]))
+            cal_event.add('location', location_str)
+            cal.add_component(cal_event)
+        except Exception as e:
+            print(e)
         
-        location = event['location']
-        location_str = ', '.join(filter(None, [
-            location.get('building'),
-            location.get('room_number'),
-            location.get('street'),
-            location.get('city'),
-            location.get('state'),
-            location.get('zipcode')
-        ]))
-        cal_event.add('location', location_str)
-        
-        cal.add_component(cal_event)
-    
     # Create a response object
     response = Response(cal.to_ical(), mimetype='text/calendar')
     response.headers['Content-Disposition'] = 'attachment; filename=calendar.ics'
