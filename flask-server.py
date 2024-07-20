@@ -1,6 +1,7 @@
-from flask import Flask, jsonify, request, send_file
+from flask import Flask, Response, jsonify, request, send_file
 from flask_cors import CORS
 from pathlib import Path
+from icalendar import Calendar, Event
 import json
 
 from campuspulse_event_ingest_schema import NormalizedEvent
@@ -16,6 +17,27 @@ alldata = []
 def public_json():
 
     return jsonify(alldata)
+
+@app.route('/v0/public.ics')
+def public_ics():    
+    # Create a new calendar
+    cal = Calendar()
+    
+    # Add events to the calendar
+    for event in alldata:
+        cal_event = Event()
+        cal_event.add('summary', event['summary'])
+        cal_event.add('dtstart', datetime.strptime(event['dtstart'], '%Y-%m-%d %H:%M:%S'))
+        cal_event.add('dtend', datetime.strptime(event['dtend'], '%Y-%m-%d %H:%M:%S'))
+        cal_event.add('description', event['description'])
+        cal_event.add('location', event['location'])
+        cal.add_component(cal_event)
+    
+    # Create a response object
+    response = Response(cal.to_ical(), mimetype='text/calendar')
+    response.headers['Content-Disposition'] = 'attachment; filename=calendar.ics'
+    
+    return response
 
 def update_data(input_dir):
     global alldata
