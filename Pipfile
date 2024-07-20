@@ -7,6 +7,7 @@ name = "pypi"
 flask = "*"
 campuspulse-event-ingest-schema = "*"
 flask-cors = "*"
+icalendar = "*"
 
 [dev-packages]
 
