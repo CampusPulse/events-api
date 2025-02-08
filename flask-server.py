@@ -112,15 +112,14 @@ def upload():
             app.logger.info(f"File saved successfully: {destination}")
 
             # clean up older files from destination.parent
-            for item in destination.parent.iterdir():
+            for item in input_dir.iterdir():
                 if item!= destination:  # skip destination file
                     if item.is_file():
                         try:
                             item.unlink()
                         except OSError as e:
                             app.logger.error(f"Error deleting file {item}: {e}")
-
-            update_data(destination.parent)
+            update_data(input_dir)
             return jsonify({'message': 'Success'}), 200
 
         except Exception as e:  # potential catch
