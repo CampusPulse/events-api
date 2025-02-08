@@ -17,8 +17,11 @@ CORS(app)
 alldata = []
 
 input_dir = Path("./data")
+if not input_dir.exists():
+    input_dir.mkdir()
 archive_dir = Path("./data/archive")
-
+if not archive_dir.exists():
+    archive_dir.mkdir()
 
 def check_auth(username, password):
     expected_credential = os.getenv("UPLOAD_CREDENTIAL")
