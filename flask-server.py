@@ -91,7 +91,7 @@ def allowed_file(filename):
 @app.route('/v0/import', methods=["POST"])
 @login_required
 def upload():
-
+    global alldata
     # check if the post request has the file part
     if 'file' not in request.files:
         return jsonify({'message': 'No Files Provided'}), 400
@@ -119,6 +119,7 @@ def upload():
                             item.unlink()
                         except OSError as e:
                             app.logger.error(f"Error deleting file {item}: {e}")
+            alldata = []
             update_data(input_dir)
             return jsonify({'message': 'Success'}), 200
 
