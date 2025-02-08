@@ -103,8 +103,26 @@ def upload():
         if destination.exists():
             timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
             archive_file(destination, timezone, archive_dir)
-        file.save()
-        return jsonify({'message': 'Success'}), 200
+        # file save parts    
+        try:
+            file.save(destination) 
+            app.logger.info(f"File saved successfully: {destination}")
+
+            # clean up older files from destination.parent
+            for item in destination.parent.iterdir():
+                if item!= destination:  # skip destination file
+                    if item.is_file():
+                        try:
+                            item.unlink()
+                        except OSError as e:
+                            app.logger.error(f"Error deleting file {item}: {e}")
+
+            update_data(destination.parent)
+            return jsonify({'message': 'Success'}), 200
+
+        except Exception as e:  # potential catch
+            app.logger.error(f"Error saving file {destination}: {e}")
+            return jsonify({'message': 'Error saving file'}), 500 
 
 def update_data(input_dir):
     global alldata
