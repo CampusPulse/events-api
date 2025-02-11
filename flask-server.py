@@ -9,7 +9,7 @@ from campuspulse_event_ingest_schema import NormalizedEvent
 from flask import Flask, Response, jsonify, request
 from flask import request as frequest
 from flask_cors import CORS
-from ics import Calendar, Event
+from icalendar import Calendar, Event
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
@@ -59,10 +59,10 @@ def public_ics():
     for event in alldata:
         try:
             cal_event = Event()
-            cal_event.name = event["title"]
-            cal_event.begin = event["start"]
-            cal_event.end = event["end"]
-            cal_event.description = event["description"]
+            cal_event.add("summary", event["title"])
+            cal_event.add("dtstart", event["start"])
+            cal_event.add("dtend", event["end"])
+            cal_event.add("description", event["description"])
 
             location = event["location"]
             location_str = ", ".join(
@@ -79,9 +79,9 @@ def public_ics():
                 )
             )
             if location_str:
-                cal_event.location = location_str
+                cal_event.add("location", location_str)
 
-            cal.events.add(cal_event)
+            cal.add_component(cal_event)
         except Exception as e:
             print(e)
 
@@ -97,10 +97,10 @@ def get_event(event_id):
         event = next(e for e in alldata if e["id"] == event_id)
         cal = Calendar()
         cal_event = Event()
-        cal_event.name = event["title"]
-        cal_event.begin = event["start"]
-        cal_event.end = event["end"]
-        cal_event.description = event["description"]
+        cal_event.add("summary", event["title"])
+        cal_event.add("dtstart", event["start"])
+        cal_event.add("dtend", event["end"])
+        cal_event.add("description", event["description"])
 
         location = event["location"]
         location_str = ", ".join(
@@ -117,9 +117,9 @@ def get_event(event_id):
             )
         )
         if location_str:
-            cal_event.location = location_str
+            cal_event.add("location", location_str)
 
-        cal.events.add(cal_event)
+        cal.add_component(cal_event)
 
         response = Response(str(cal), mimetype="text/calendar")
         response.headers["Content-Disposition"] = f"attachment; filename={event_id}.ics"
