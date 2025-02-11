@@ -134,7 +134,7 @@ def upload():
 
         if destination.exists():
             timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-            archive_file(destination, timezone, archive_dir)
+            archive_file(destination, timestamp, archive_dir)
 
         temp_dest.rename(destination)
         app.logger.info(f"File saved successfully: {destination}")
