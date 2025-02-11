@@ -1,7 +1,7 @@
 import json
 import logging
 import os
-from datetime import date, datetime, timezone
+from datetime import datetime, timezone
 from functools import wraps
 from pathlib import Path
 
@@ -88,6 +88,44 @@ def public_ics():
     response = Response(str(cal), mimetype="text/calendar")
     response.headers["Content-Disposition"] = "attachment; filename=calendar.ics"
     return response
+
+
+@app.route("/v0/public.ics/<event_id>")
+def get_event(event_id):
+    try:
+        # Find first event with matching id
+        event = next(e for e in alldata if e["id"] == event_id)
+        cal = Calendar()
+        cal_event = Event()
+        cal_event.name = event["title"]
+        cal_event.begin = event["start"]
+        cal_event.end = event["end"]
+        cal_event.description = event["description"]
+
+        location = event["location"]
+        location_str = ", ".join(
+            filter(
+                None,
+                [
+                    location.get("building"),
+                    location.get("room_number"),
+                    location.get("street"),
+                    location.get("city"),
+                    location.get("state"),
+                    location.get("zipcode"),
+                ],
+            )
+        )
+        if location_str:
+            cal_event.location = location_str
+
+        cal.events.add(cal_event)
+
+        response = Response(str(cal), mimetype="text/calendar")
+        response.headers["Content-Disposition"] = f"attachment; filename={event_id}.ics"
+        return response
+    except StopIteration:
+        return jsonify({"message": "Event not found"}), 404
 
 
 def archive_file(archive_filename, timestamp, archive_path):
