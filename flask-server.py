@@ -16,6 +16,8 @@ CORS(app)
 
 alldata = []
 
+MINIMUM_FILE_UPLOAD_SIZE_BYTES = 1024
+
 input_dir = Path("./data")
 if not input_dir.exists():
     input_dir.mkdir()
@@ -103,29 +105,43 @@ def upload():
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
         destination = input_dir.joinpath(filename)
-        if destination.exists():
-            timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-            archive_file(destination, timezone, archive_dir)
+        temp_dest = input_dir.joinpath(filename + "_temp")
+
+        if temp_dest.exists():
+            temp_dest.unlink()
+        
         # file save parts    
         try:
-            file.save(destination) 
-            app.logger.info(f"File saved successfully: {destination}")
-
-            # clean up older files from destination.parent
-            for item in input_dir.iterdir():
-                if item!= destination:  # skip destination file
-                    if item.is_file():
-                        try:
-                            item.unlink()
-                        except OSError as e:
-                            app.logger.error(f"Error deleting file {item}: {e}")
-            alldata = []
-            update_data(input_dir)
-            return jsonify({'message': 'Success'}), 200
-
+            file.save(temp_dest) 
         except Exception as e:  # potential catch
             app.logger.error(f"Error saving file {destination}: {e}")
             return jsonify({'message': 'Error saving file'}), 500 
+
+        tempsize = temp_dest.stat().st_size
+        if tempsize < MINIMUM_FILE_UPLOAD_SIZE_BYTES:
+            app.logger.error(f"Error saving file {destination}: file size {tempsize} not greater than configured minimum {MINIMUM_FILE_UPLOAD_SIZE_BYTES}")
+            temp_dest.unlink()
+            return jsonify({'message': 'File too small'}), 400 
+
+        if destination.exists():
+            timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+            archive_file(destination, timezone, archive_dir)
+
+        temp_dest.rename(destination)
+        app.logger.info(f"File saved successfully: {destination}")
+
+        # clean up older files from destination.parent
+        for item in input_dir.iterdir():
+            if item!= destination:  # skip destination file
+                if item.is_file():
+                    try:
+                        item.unlink()
+                    except OSError as e:
+                        app.logger.error(f"Error deleting file {item}: {e}")
+        alldata = []
+        update_data(input_dir)
+        return jsonify({'message': 'Success'}), 200
+
 
 def update_data(input_dir):
     global alldata
