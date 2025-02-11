@@ -6,10 +6,10 @@ from functools import wraps
 from pathlib import Path
 
 from campuspulse_event_ingest_schema import NormalizedEvent
-from flask import Flask, Response, jsonify, request, send_file
+from flask import Flask, Response, jsonify, request
 from flask import request as frequest
 from flask_cors import CORS
-from icalendar import Calendar, Event
+from ics import Calendar, Event
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
@@ -37,7 +37,6 @@ def check_auth(username, password):
 def login_required(f):
     """basic auth for api"""
 
-    # https://stackoverflow.com/a/70317010/
     @wraps(f)
     def decorated_function(*args, **kwargs):
         auth = frequest.authorization
@@ -55,17 +54,15 @@ def public_json():
 
 @app.route("/v0/public.ics")
 def public_ics():
-    # Create a new calendar
     cal = Calendar()
 
-    # Add events to the calendar
     for event in alldata:
         try:
             cal_event = Event()
-            cal_event.add("summary", event["title"])
-            cal_event.add("dtstart", event["start"])
-            cal_event.add("dtend", event["end"])
-            cal_event.add("description", event["description"])
+            cal_event.name = event["title"]
+            cal_event.begin = event["start"]
+            cal_event.end = event["end"]
+            cal_event.description = event["description"]
 
             location = event["location"]
             location_str = ", ".join(
@@ -81,15 +78,15 @@ def public_ics():
                     ],
                 )
             )
-            cal_event.add("location", location_str)
-            cal.add_component(cal_event)
+            if location_str:
+                cal_event.location = location_str
+
+            cal.events.add(cal_event)
         except Exception as e:
             print(e)
 
-    # Create a response object
-    response = Response(cal.to_ical(), mimetype="text/calendar")
+    response = Response(str(cal), mimetype="text/calendar")
     response.headers["Content-Disposition"] = "attachment; filename=calendar.ics"
-
     return response
 
 
@@ -108,12 +105,9 @@ def allowed_file(filename):
 @login_required
 def upload():
     global alldata
-    # check if the post request has the file part
     if "file" not in request.files:
         return jsonify({"message": "No Files Provided"}), 400
     file = request.files["file"]
-    # If the user does not select a file, the browser submits an
-    # empty file without a filename.
     if file.filename == "":
         return jsonify({"message": "empty filename"}), 400
     if file and allowed_file(file.filename):
@@ -124,10 +118,9 @@ def upload():
         if temp_dest.exists():
             temp_dest.unlink()
 
-        # file save parts
         try:
             file.save(temp_dest)
-        except Exception as e:  # potential catch
+        except Exception as e:
             app.logger.error(f"Error saving file {destination}: {e}")
             return jsonify({"message": "Error saving file"}), 500
 
@@ -146,9 +139,8 @@ def upload():
         temp_dest.rename(destination)
         app.logger.info(f"File saved successfully: {destination}")
 
-        # clean up older files from destination.parent
         for item in input_dir.iterdir():
-            if item != destination:  # skip destination file
+            if item != destination:
                 if item.is_file():
                     try:
                         item.unlink()
@@ -168,8 +160,6 @@ def update_data(input_dir):
         tzun_count = 0
         for line in datafile.read_text().split("\n"):
             if line.strip() != "":
-                # TODO: update date filters on each request or on a schedule to keep it up to date
-
                 event = NormalizedEvent.parse_obj(json.loads(line))
                 try:
                     if not event.start < datetime.now(timezone.utc):
@@ -179,8 +169,6 @@ def update_data(input_dir):
                         str(e)
                         != "can't compare offset-naive and offset-aware datetimes"
                     ):
-                        # app.logger.error(f"file {datafile }")
-
                         raise
                     tzun_count += 1
         if tzun_count >= 1:

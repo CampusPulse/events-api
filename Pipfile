@@ -8,6 +8,7 @@ flask = "*"
 campuspulse-event-ingest-schema = "*"
 flask-cors = "*"
 icalendar = "*"
+ics = "*"
 
 [dev-packages]
 
